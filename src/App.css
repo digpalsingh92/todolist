@@ -1,0 +1,29 @@
+.todo__div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.todo__div input{
+    padding: 10px;
+    width: 20%;
+}
+.todo__div button{
+    padding: 10px;
+    font-size: medium;
+    font-weight: 600;
+}
+.todo__list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+.todo__item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
