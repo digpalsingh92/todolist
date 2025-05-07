@@ -6,10 +6,16 @@ import TodoList from "./components/TodoList";
 const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_TODO":
-      return [...state, action.payload];
+      return [...state, action.payload]; //
     case "REMOVE_TODO":
-      return state.filter((todo) => todo.id !== action.payload);
-   
+      return state.filter((todo) => todo.id !== action.payload); // Remove todo by id
+    case "TOGGLE_TODO":
+      return state.map((todo) =>
+        todo.id === action.payload
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      ); // check the todo via todo. id and then toggle the completed field.
+
     default:
       return state;
   }
@@ -19,8 +25,8 @@ const reducer = (state, action) => {
 const init = () => {
   try {
     const storedTodos = localStorage.getItem("todos");
-    const parsedTodos = JSON.parse(storedTodos);
-    return Array.isArray(parsedTodos) ? parsedTodos : [];
+    const parsedTodos = JSON.parse(storedTodos); // Parse the JSON string into an object
+    return Array.isArray(parsedTodos) ? parsedTodos : []; // Ensure it's an array
   } catch (e) {
     console.error("Failed to load todos from localStorage", e);
     return [];
@@ -28,7 +34,10 @@ const init = () => {
 }; // Initialize state with localStorage data
 
 const App = () => {
-  const [todo, setTodo] = useState(""); // State for input value
+  const [todo, setTodo] = useState({
+    text: "",
+    description: ""
+  }); // State for input value
   const [todos, dispatch] = useReducer(reducer, [], init); // useReducer with lazy init
 
   const inputRef = useRef(null); // Ref for input field
@@ -42,19 +51,23 @@ const App = () => {
   const handleClick = (e) => {
     e.preventDefault();
 
-    if (!todo.trim()) {
+    if (!todo.text.trim()) {
       alert("Please enter a task");
       return;
     }
 
     const newTodo = {
       id: Date.now(),
-      text: todo.trim(),
+      text: todo.text.trim(),
+      description: todo.description,
       completed: false,
     };
 
-    dispatch({ type: "ADD_TODO", payload: newTodo }); // Dispatch action to add todo 
-    setTodo(""); // Clear input field
+    dispatch({ type: "ADD_TODO", payload: newTodo }); // Dispatch action to add todo
+    setTodo({
+      text: "",
+      description: ""
+    }); // Clear input field
 
     inputRef.current.focus(); // Focus on input field
     inputRef.current.value = ""; // Clear input field
@@ -62,7 +75,12 @@ const App = () => {
 
   const removeTodo = (id) => {
     dispatch({ type: "REMOVE_TODO", payload: id }); // Dispatch action to remove todo
-  }
+  };
+
+  const toggleTodo = (id) => {
+    dispatch({ type: "TOGGLE_TODO", payload: id });
+  
+  };
 
   return (
     <div>
@@ -72,7 +90,12 @@ const App = () => {
         handleClick={handleClick} // Pass handleClick to TodoInput
         inputRef={inputRef} // Pass inputRef to TodoInput
       />
-      <TodoList todos={todos} removeTodo={removeTodo}/>
+      <TodoList 
+        todo={todo} // Pass todo state to TodoInput
+      todos={todos} // Pass todos state to TodoList
+      removeTodo={removeTodo} // Pass removeTodo to TodoList
+      toggleTodo={toggleTodo} // Pass toggleTodo to TodoList
+       />
     </div>
   );
 };
