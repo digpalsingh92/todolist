@@ -16,7 +16,10 @@ const TodoList = ({ todos, removeTodo, toggleTodo, setEditingTodoId, setTodo }) 
               <h2>{todo.text}</h2>
               <span style={{width: "100%", border: "1px solid grey"}}></span>
               <p>{todo.description}</p>
+              <div style={{display:'flex', flexDirection:"row", justifyContent:'space-between'}}>
               <p style={{ fontSize: '12px', color: '#666' }}>Created At: {todo.createdAt}</p>
+              <p style={{ fontSize: '12px', color: '#666' }}>Todo Added By: {todo.addedBy}</p>
+              </div>
               </div>
               <div className="todoButton__div">
              {todo.completed === false ? ( <button

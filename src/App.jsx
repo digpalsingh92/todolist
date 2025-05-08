@@ -2,6 +2,8 @@ import React, { act, useEffect, useReducer, useRef, useState } from "react";
 import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
 
+import Home from "./components/Home";
+
 // Reducer function
 const reducer = (state, action) => {
   switch (action.type) {
@@ -43,6 +45,9 @@ const init = () => {
 }; // Initialize state with localStorage data
 
 const App = () => {
+  const [username, setUsername] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [editingTodoId, setEditingTodoId] = useState(null);
   const [todo, setTodo] = useState({
     text: "",
@@ -83,6 +88,7 @@ const App = () => {
         description: todo.description,
         completed: false,
         createdAt: new Date().toLocaleString(), // Add createdAt property which is the current date and time
+        addedBy: username,
       };
 
       dispatch({ type: "ADD_TODO", payload: newTodo }); // Dispatch action to add todo
@@ -105,23 +111,33 @@ const App = () => {
   };
 
   return (
-    <div>
-      <TodoInput
-        todo={todo} // Pass todo state to TodoInput
-        setTodo={setTodo} // Pass setTodo to TodoInput
-        handleClick={handleClick} // Pass handleClick to TodoInput
-        inputRef={inputRef} // Pass inputRef to TodoInput
-        editingTodoId={editingTodoId}
-      />
-      <TodoList
-        todo={todo} // Pass todo state to TodoInput
-        todos={todos} // Pass todos state to TodoList
-        removeTodo={removeTodo} // Pass removeTodo to TodoList
-        toggleTodo={toggleTodo}
-        setTodo={setTodo}
-        setEditingTodoId={setEditingTodoId} // Pass toggleTodo to TodoList
-      />
-    </div>
+    <>
+      {!isLoggedIn ? (
+        <Home
+          username={username}
+          setIsLoggedIn={setIsLoggedIn}
+          setUsername={setUsername}
+        />
+      ) : (
+        <>
+          <TodoInput
+            todo={todo} // Pass todo state to TodoInput
+            setTodo={setTodo} // Pass setTodo to TodoInput
+            handleClick={handleClick} // Pass handleClick to TodoInput
+            inputRef={inputRef} // Pass inputRef to TodoInput
+            editingTodoId={editingTodoId}
+          />
+          <TodoList
+            todo={todo} // Pass todo state to TodoInput
+            todos={todos} // Pass todos state to TodoList
+            removeTodo={removeTodo} // Pass removeTodo to TodoList
+            toggleTodo={toggleTodo}
+            setTodo={setTodo}
+            setEditingTodoId={setEditingTodoId} // Pass toggleTodo to TodoList
+          />
+        </>
+      )}
+    </>
   );
 };
 
