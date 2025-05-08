@@ -1,44 +1,54 @@
 import React from "react";
 
-const TodoList = ({todo, todos, removeTodo, toggleTodo }) => {
-  if (todos.length === 0) {
-    return <p>No tasks yet. Add some!</p>;
-  }
-  console.log();
-  // background-color: #f0f0f0;
-
+const TodoList = ({ todos, removeTodo, toggleTodo, setEditingTodoId, setTodo }) => {
   return (
     <div className="todo__list">
-      <h2>All Todos</h2>
+      <h2 style={{color:'white'}}>All Todos</h2>
       {todos.length > 0 ? (
-        <ul>
+        <div className="todoList__mainDiv">
           {todos.map((todo) => (
             <div className="todo__item"
             style={{
               backgroundColor: todo.completed ?  "#8ac815":"#f0f0f0"
             }}
             key={todo.id}>
-              <span>{todo.text}</span>
+              <div className="todoList__div">
+              <h2>{todo.text}</h2>
+              <span style={{width: "100%", border: "1px solid grey"}}></span>
               <p>{todo.description}</p>
+              <p style={{ fontSize: '12px', color: '#666' }}>Created At: {todo.createdAt}</p>
+              </div>
               <div className="todoButton__div">
+             {todo.completed === false ? ( <button
+                  style={{borderRadius:'5px', border: '2px solid grey'}}
+                  onClick={() => {
+                    setTodo({
+                      text: todo.text,
+                      description: todo.description,
+                    }); // Set the todo state to the todo being edited
+                    setEditingTodoId(todo.id); // Set the editingTodoId to the id of the todo being edited
+                  }}
+                >
+                  Edit
+                </button>):( <button style={{display: 'none'}}>Edit</button>)}
                 {todo.completed == false ? (<button
-                  style={{ fontSize: "15px" }}
+                  style={{border:"2px solid green", color:'green', borderRadius:"5px" }}
                   onClick={() => toggleTodo(todo.id)}
                 >
-                  Mark as Completed
-                </button>) : (<span></span>)}
+                 Done
+                </button>) : (<button style={{display:'none' }}>Done</button>)}
                 <button
-                  style={{ fontSize: "25px" }}
+                  style={{borderRadius:'5px', color:'red', border:'2px solid red' }}
                   onClick={() => removeTodo(todo.id)}
                 >
-                  X
+                  Delete
                 </button>
               </div>
             </div>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p>No tasks yet. Add some!</p>
+        <p style={{color:'white'}}>No tasks yet. Add some!</p>
       )}
     </div>
   );

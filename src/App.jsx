@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { act, useEffect, useReducer, useRef, useState } from "react";
 import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
 
@@ -15,7 +15,16 @@ const reducer = (state, action) => {
           ? { ...todo, completed: !todo.completed }
           : todo
       ); // check the todo via todo. id and then toggle the completed field.
-
+    case "UPDATE_TODO":
+      return state.map((todo) =>
+        todo.id === action.payload.id
+          ? {
+              ...todo,
+              text: action.payload.text,
+              description: action.payload.description,
+            }
+          : todo
+      );
     default:
       return state;
   }
@@ -34,9 +43,10 @@ const init = () => {
 }; // Initialize state with localStorage data
 
 const App = () => {
+  const [editingTodoId, setEditingTodoId] = useState(null);
   const [todo, setTodo] = useState({
     text: "",
-    description: ""
+    description: "",
   }); // State for input value
   const [todos, dispatch] = useReducer(reducer, [], init); // useReducer with lazy init
 
@@ -56,17 +66,30 @@ const App = () => {
       return;
     }
 
-    const newTodo = {
-      id: Date.now(),
-      text: todo.text.trim(),
-      description: todo.description,
-      completed: false,
-    };
+    if (editingTodoId !== null) {
+      dispatch({
+        type: "UPDATE_TODO",
+        payload: {
+          id: editingTodoId,
+          text: todo.text.trim(),
+          description: todo.description,
+        },
+      }); // Dispatch action to update todo
+      setEditingTodoId(null); // Reset editingTodoId
+    } else {
+      const newTodo = {
+        id: Date.now(),
+        text: todo.text.trim(),
+        description: todo.description,
+        completed: false,
+        createdAt: new Date().toLocaleString(), // Add createdAt property which is the current date and time
+      };
 
-    dispatch({ type: "ADD_TODO", payload: newTodo }); // Dispatch action to add todo
+      dispatch({ type: "ADD_TODO", payload: newTodo }); // Dispatch action to add todo
+    }
     setTodo({
       text: "",
-      description: ""
+      description: "",
     }); // Clear input field
 
     inputRef.current.focus(); // Focus on input field
@@ -79,7 +102,6 @@ const App = () => {
 
   const toggleTodo = (id) => {
     dispatch({ type: "TOGGLE_TODO", payload: id });
-  
   };
 
   return (
@@ -89,13 +111,16 @@ const App = () => {
         setTodo={setTodo} // Pass setTodo to TodoInput
         handleClick={handleClick} // Pass handleClick to TodoInput
         inputRef={inputRef} // Pass inputRef to TodoInput
+        editingTodoId={editingTodoId}
       />
-      <TodoList 
+      <TodoList
         todo={todo} // Pass todo state to TodoInput
-      todos={todos} // Pass todos state to TodoList
-      removeTodo={removeTodo} // Pass removeTodo to TodoList
-      toggleTodo={toggleTodo} // Pass toggleTodo to TodoList
-       />
+        todos={todos} // Pass todos state to TodoList
+        removeTodo={removeTodo} // Pass removeTodo to TodoList
+        toggleTodo={toggleTodo}
+        setTodo={setTodo}
+        setEditingTodoId={setEditingTodoId} // Pass toggleTodo to TodoList
+      />
     </div>
   );
 };
